@@ -16,32 +16,31 @@ app.use((req, res, next) => {
 
 
 // Connect to MongoDB
-// import { MongoClient, ObjectId } from 'mongodb';
-// const client = new MongoClient('mongodb://localhost:27017');
-// const conn = await client.connect();
+import { MongoClient, ObjectId } from 'mongodb'; // import MongoDB Client
+const client = new MongoClient('mongodb://localhost:27017'); // connect to the host
+const connection = await client.connect(); // store the connection
+const db = connection.db("app")
 
-app.get('/api/documents.json', async (req, res) => {
-  res.json([
-    {
-      name: "Apple",
-      category: "fruit",
-      price: 1.99,
-      quantity: 150,
-      supplier: "Organic Farms Inc",
-      organic: true,
-      country: "USA",
-      expiration: new Date("2023-12-15")
-    },
-    {
-      name: "Banana",
-      category: "fruit",
-      price: 0.59,
-      quantity: 200,
-      supplier: "Tropical Imports",
-      organic: false,
-      country: "Ecuador",
-      expiration: new Date("2023-12-10")
-    }]).status(200);
+app.get('/api/produce.json', async (req, res) => {
+  const produce = await db.collection('produce').find().toArray()
+  res.json(produce).status(200);
+});
+
+// route for Banana document
+// app.get('/api/produce/67e40f14c19ec4a1c06b140c.json', async (req, res) => {
+//   const Banana = await db.collection('produce').findOne({
+//     _id: new ObjectId("67e40f14c19ec4a1c06b140c")
+//   })
+//   res.json(Banana).status(200);
+// });
+
+// route for any singe document using Express Params
+app.get('/api/produce/:id.json', async (req, res) => {
+  const id = req.params.id
+  const Banana = await db.collection('produce').findOne({
+    _id: new ObjectId(id)
+  })
+  res.json(Banana).status(200);
 });
 
 
